@@ -16,20 +16,12 @@ class Manager(object):
     def __init__(self, args, model, shared_layer_info, masks, train_loader, val_loader):
         self.args  = args
         self.model = model
-        self.shared_layer_info = shared_layer_info
         self.inference_dataset_idx = self.model.module.datasets.index(args.dataset) + 1
-        self.pruner = SparsePruner(self.model, masks, self.args, None, None, self.inference_dataset_idx)
         self.train_loader = train_loader
         self.val_loader   = val_loader
 
-        if args.dataset == 'face_verification':
-            self.criterion = AngleLoss()
-        elif args.dataset == 'emotion':
-            class_counts = torch.from_numpy(np.array([74874, 134415, 25459, 14090, 6378, 3803, 24882]).astype(np.float32))
-            class_weights = (torch.sum(class_counts) - class_counts) / class_counts
-            self.criterion = nn.CrossEntropyLoss(weight=class_weights.cuda())
-        else:
-            self.criterion = nn.CrossEntropyLoss()
+
+        self.criterion = nn.CrossEntropyLoss()
         return
 
     def train(self, optimizers, epoch_idx, curr_lrs):
@@ -59,26 +51,20 @@ class Manager(object):
                 train_loss.update(loss, num)
                 loss.backward()
 
-                # Set fixed param grads to 0.
-                self.pruner.do_weight_decay_and_make_grads_zero()
 
-                # Gradient is applied across all ranks
                 optimizers.step()
 
-                # Set pruned weights to 0.
-                self.pruner.make_pruned_zero()
 
                 t.set_postfix({'loss': train_loss.avg.item(),
                                'accuracy': '{:.2f}'.format(100. * train_accuracy.avg.item()),
-                               'lr': curr_lrs[0],
-                               'sparsity': self.pruner.calculate_sparsity()})
+                               'lr': curr_lrs[0]})
                 t.update(1)
         return train_accuracy.avg.item()
 
     #{{{ Evaluate classification
     def validate(self, epoch_idx, biases=None):
         """Performs evaluation."""
-        self.pruner.apply_mask()
+
         self.model.eval()
         val_loss = Metric('val_loss')
         val_accuracy = Metric('val_accuracy')
@@ -98,9 +84,7 @@ class Manager(object):
 
                     t.set_postfix({'loss': val_loss.avg.item(),
                                    'accuracy': '{:.2f}'.format(100. * val_accuracy.avg.item()),
-                                   'sparsity': self.pruner.calculate_sparsity(),
-                                   'task{} ratio'.format(self.inference_dataset_idx): self.pruner.calculate_curr_task_ratio(),
-                                   'zero ratio': self.pruner.calculate_zero_ratio()})
+                                })
                     t.update(1)
         return val_accuracy.avg.item()
     #}}}

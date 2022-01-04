@@ -31,8 +31,9 @@ ARCH='resnet18'
 FINETUNE_EPOCHS=100
 PATH_DATA='/lustre/home/ec186/jianj/dataset/cifar100_org/'
 
-for TASK_ID in `seq 1 20`; do
-    CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_cifar100_main_normal.py \
+
+TASK_ID=1
+CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_cifar100_main_normal.py \
         --arch $ARCH \
         --path $PATH_DATA \
         --dataset ${DATASETS[TASK_ID]} --num_classes 5 \
@@ -41,15 +42,27 @@ for TASK_ID in `seq 1 20`; do
         --save_folder checkpoints/baseline/experiment1/$ARCH/${DATASETS[TASK_ID]} \
         --epochs $FINETUNE_EPOCHS \
         --mode finetune \
-        --logfile logs/baseline_cifar100_acc.txt
-done
+        --logfile logs/baseline_cifar100_acc2.txt
 
-
-for HISTORY_ID in `seq 1 20`; do
-    CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_cifar100_main_normal.py \
-        --arch $ARCH \
-        --path $PATH_DATA \
-        --dataset ${DATASETS[HISTORY_ID]} --num_classes 5 \
-        --load_folder checkpoints/baseline/experiment1/$ARCH/${DATASETS[HISTORY_ID]} \
-        --mode inference
-done
+#for TASK_ID in `seq 1 20`; do
+#    CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_cifar100_main_normal.py \
+#        --arch $ARCH \
+#        --path $PATH_DATA \
+#        --dataset ${DATASETS[TASK_ID]} --num_classes 5 \
+#        --lr 1e-2 \
+#        --weight_decay 4e-5 \
+#        --save_folder checkpoints/baseline/experiment1/$ARCH/${DATASETS[TASK_ID]} \
+#        --epochs $FINETUNE_EPOCHS \
+#        --mode finetune \
+#        --logfile logs/baseline_cifar100_acc.txt
+#done
+#
+#
+#for HISTORY_ID in `seq 1 20`; do
+#    CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_cifar100_main_normal.py \
+#        --arch $ARCH \
+#        --path $PATH_DATA \
+#        --dataset ${DATASETS[HISTORY_ID]} --num_classes 5 \
+#        --load_folder checkpoints/baseline/experiment1/$ARCH/${DATASETS[HISTORY_ID]} \
+#        --mode inference
+#done
