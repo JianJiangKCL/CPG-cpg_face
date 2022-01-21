@@ -204,8 +204,9 @@ class Manager(object):
     def load_checkpoint_for_inference(self, resume_from_epoch, save_folder):
 
         if resume_from_epoch > 0:
-            filepath = self.args.checkpoint_format.format(save_folder=save_folder, epoch=resume_from_epoch)
-            checkpoint = torch.load(filepath)
+            # filepath = self.args.checkpoint_format.format(save_folder=save_folder, epoch=resume_from_epoch)
+            # checkpoint = torch.load(filepath)
+            checkpoint = torch.load(save_folder + '/checkpoint-{}.pth.tar'.format(resume_from_epoch))
             checkpoint_keys = checkpoint.keys()
             state_dict = checkpoint['model_state_dict']
             curr_model_state_dict = self.model.module.state_dict()

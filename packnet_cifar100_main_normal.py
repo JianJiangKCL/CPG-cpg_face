@@ -78,7 +78,7 @@ parser.add_argument('--mode',
 parser.add_argument('--logfile', type=str, help='file to save baseline accuracy')
 parser.add_argument('--initial_from_task', type=str, help="")
 
-
+parser.add_argument('--pretrained', type=int, default=0, help='')
 def main():
     """Do stuff."""
     args = parser.parse_args()
@@ -96,7 +96,8 @@ def main():
     cudnn.benchmark = True
 
     # If set > 0, will resume training from a given checkpoint.
-    resume_from_epoch = 0
+    #todo change it back to 0
+    resume_from_epoch = 30
     resume_folder = args.load_folder
     for try_epoch in range(200, 0, -1):
         if os.path.exists(args.checkpoint_format.format(
@@ -111,9 +112,12 @@ def main():
     utils.set_dataset_paths(args)
 
     if resume_from_epoch:
-        filepath = args.checkpoint_format.format(save_folder=resume_folder, epoch=resume_from_epoch)
-        checkpoint = torch.load(filepath)
+        # filepath = args.checkpoint_format.format(save_folder=resume_folder, epoch=resume_from_epoch)
+        # checkpoint = torch.load(filepath)
+        checkpoint = torch.load(args.load_folder + '/checkpoint-{}.pth.tar'.format(resume_from_epoch))
+
         checkpoint_keys = checkpoint.keys()
+
         dataset_history = checkpoint['dataset_history']
         dataset2num_classes = checkpoint['dataset2num_classes']
         masks = checkpoint['masks']
@@ -134,6 +138,13 @@ def main():
         model = packnet_models.__dict__[args.arch](pretrained=False, dataset_history=dataset_history, dataset2num_classes=dataset2num_classes)
     elif args.arch == 'resnet18':
         model = packnet_models.__dict__[args.arch](dataset_history=dataset_history, dataset2num_classes=dataset2num_classes)
+        if args.pretrained:
+            print('-----------load pretrained--------------')
+            state_dict = torch.load('resnet18-5c106cde.pth')
+            curr_model_state_dict = model.state_dict()
+            for name, param in state_dict.items():
+                if 'fc' not in name:
+                    curr_model_state_dict[name].copy_(param)
     else:
         print('Error!')
         sys.exit(0)
@@ -271,7 +282,6 @@ def main():
                 for param_group in optimizers[0].param_groups:
                     param_group['lr'] *= 0.1
                 curr_lrs[0] = param_group['lr']
-
 
     if args.save_folder is not None:
     #     paths = os.listdir(args.save_folder)
