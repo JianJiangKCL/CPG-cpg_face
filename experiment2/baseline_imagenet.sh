@@ -43,7 +43,7 @@ INIT_LR=(
 
 GPU_ID=1
 ARCH='resnet18'
-FINETUNE_EPOCHS=100
+FINETUNE_EPOCHS=1
 PATH_DATA='/vol/jj/dataset/KM_dataset'
 # ResNet50 pretrained on ImageNet
 #echo {\"imagenet\": \"0.7616\"} > logs/baseline_imagenet_acc_${ARCH}.txt

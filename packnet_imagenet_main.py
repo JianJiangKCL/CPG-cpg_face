@@ -295,20 +295,20 @@ def main():
 
     if args.mode == 'finetune':
         manager.pruner.make_finetuning_mask()
-        if args.dataset == 'imagenet':
-            avg_val_acc = manager.validate(0)
-            manager.save_checkpoint(optimizers, 0, args.save_folder)
-            if args.logfile:
-                json_data = {}
-                if os.path.isfile(args.logfile):
-                    with open(args.logfile) as json_file:
-                        json_data = json.load(json_file)
-
-                json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
-
-                with open(args.logfile, 'w') as json_file:
-                    json.dump(json_data, json_file)
-            return
+        # if args.dataset == 'imagenet':
+        #     avg_val_acc = manager.validate(0)
+        #     manager.save_checkpoint(optimizers, 0, args.save_folder)
+        #     if args.logfile:
+        #         json_data = {}
+        #         if os.path.isfile(args.logfile):
+        #             with open(args.logfile) as json_file:
+        #                 json_data = json.load(json_file)
+        #
+        #         json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
+        #
+        #         with open(args.logfile, 'w') as json_file:
+        #             json.dump(json_data, json_file)
+        #     return
 
         history_best_val_acc = 0.0
         num_epochs_that_criterion_does_not_get_better = 0
@@ -382,15 +382,18 @@ def main():
     elif args.mode == 'finetune':
         manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
         if args.logfile:
-            json_data = {}
-            if os.path.isfile(args.logfile):
-                with open(args.logfile) as json_file:
-                    json_data = json.load(json_file)
-
-            json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
-
-            with open(args.logfile, 'w') as json_file:
-                json.dump(json_data, json_file)
+            with open(args.logfile, 'a') as file:
+                file.write(str(avg_val_acc) + '\n')
+        # if args.logfile:
+        #     json_data = {}
+        #     if os.path.isfile(args.logfile):
+        #         with open(args.logfile) as json_file:
+        #             json_data = json.load(json_file)
+        #
+        #     json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
+        #
+        #     with open(args.logfile, 'w') as json_file:
+        #         json.dump(json_data, json_file)
         if avg_train_acc < 0.97:
             print('Cannot prune any more!')
 
