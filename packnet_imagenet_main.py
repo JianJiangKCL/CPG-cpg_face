@@ -186,6 +186,7 @@ def main():
                 curr_model_state_dict['module.classifiers.0.bias'].copy_(state_dict['fc.bias'])
         elif args.arch == 'resnet18':
             # state_dict = model_zoo.load_url(model_urls['resnet18'])
+            print('--------------------load pretrained model-----')
             state_dict = torch.load('resnet18-5c106cde.pth')
             for name, param in state_dict.items():
                 if 'fc' not in name:
@@ -258,6 +259,8 @@ def main():
             named_of_params_to_optimize_via_SGD.append(name)
 
     # here we must set weight decay to 0.0,
+    #todo is baseline also prune??
+
     # because the weight decay strategy in build-in step() function will change every weight elem in the tensor,
     # which will hurt previous tasks' accuracy. (Instead, we do weight decay ourself in the `prune.py`)
     optimizer_network = optim.SGD(params_to_optimize_via_SGD, lr=lr,
@@ -315,51 +318,52 @@ def main():
         avg_train_acc = manager.train(optimizers, epoch_idx, curr_lrs)
         avg_val_acc = manager.validate(epoch_idx)
 
-        if args.mode == 'finetune':
-            if avg_val_acc > history_best_val_acc:
-                num_epochs_that_criterion_does_not_get_better = 0
-                history_best_val_acc = avg_val_acc
-                if args.save_folder is not None:
-                    paths = os.listdir(args.save_folder)
-                    if paths and '.pth.tar' in paths[0]:
-                        for checkpoint_file in paths:
-                            os.remove(os.path.join(args.save_folder, checkpoint_file))
-                else:
-                    print('Something is wrong! Block the program with pdb')
-                    pdb.set_trace()
-
-                manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
-
-                if args.logfile:
-                    json_data = {}
-                    if os.path.isfile(args.logfile):
-                        with open(args.logfile) as json_file:
-                            json_data = json.load(json_file)
-
-                    json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
-
-                    with open(args.logfile, 'w') as json_file:
-                        json.dump(json_data, json_file)
-            else:
-                num_epochs_that_criterion_does_not_get_better += 1
-
-            if times_of_decaying_learning_rate >= 3:
-                print()
-                print("times_of_decaying_learning_rate reach {}, stop training".format(
-                        times_of_decaying_learning_rate))
-
-                break
-
-            if num_epochs_that_criterion_does_not_get_better >= 10:
-                times_of_decaying_learning_rate += 1
-                num_epochs_that_criterion_does_not_get_better = 0
-                for param_group in optimizers[0].param_groups:
-                    param_group['lr'] *= 0.1
-                curr_lrs[0] = param_group['lr']
-                print()
-                print("continously {} epochs doesn't get higher acc, "
-                      "decay learning rate by multiplying 0.1".format(
-                        num_epochs_that_criterion_does_not_get_better))
+        # if args.mode == 'finetune':
+        #     #todo this is unfair to save the best model according to validation accuracy
+        #     if avg_val_acc > history_best_val_acc:
+        #         num_epochs_that_criterion_does_not_get_better = 0
+        #         history_best_val_acc = avg_val_acc
+        #         if args.save_folder is not None:
+        #             paths = os.listdir(args.save_folder)
+        #             if paths and '.pth.tar' in paths[0]:
+        #                 for checkpoint_file in paths:
+        #                     os.remove(os.path.join(args.save_folder, checkpoint_file))
+        #         else:
+        #             print('Something is wrong! Block the program with pdb')
+        #             pdb.set_trace()
+        #
+        #         manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
+        #
+        #         if args.logfile:
+        #             json_data = {}
+        #             if os.path.isfile(args.logfile):
+        #                 with open(args.logfile) as json_file:
+        #                     json_data = json.load(json_file)
+        #
+        #             json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
+        #
+        #             with open(args.logfile, 'w') as json_file:
+        #                 json.dump(json_data, json_file)
+        #     else:
+        #         num_epochs_that_criterion_does_not_get_better += 1
+        #
+        #     if times_of_decaying_learning_rate >= 3:
+        #         print()
+        #         print("times_of_decaying_learning_rate reach {}, stop training".format(
+        #                 times_of_decaying_learning_rate))
+        #
+        #         break
+        #
+        #     if num_epochs_that_criterion_does_not_get_better >= 10:
+        #         times_of_decaying_learning_rate += 1
+        #         num_epochs_that_criterion_does_not_get_better = 0
+        #         for param_group in optimizers[0].param_groups:
+        #             param_group['lr'] *= 0.1
+        #         curr_lrs[0] = param_group['lr']
+        #         print()
+        #         print("continously {} epochs doesn't get higher acc, "
+        #               "decay learning rate by multiplying 0.1".format(
+        #                 num_epochs_that_criterion_does_not_get_better))
 
         if args.mode == 'prune':
             if epoch_idx + 1 == 40:
@@ -371,8 +375,21 @@ def main():
         if avg_train_acc > 0.97 and (avg_val_acc - baseline_acc) >= -0.01:
             manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
         else:
+            # added by jian
+            manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
             print('Pruning too much!')
     elif args.mode == 'finetune':
+        manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
+        if args.logfile:
+            json_data = {}
+            if os.path.isfile(args.logfile):
+                with open(args.logfile) as json_file:
+                    json_data = json.load(json_file)
+
+            json_data[args.dataset] = '{:.4f}'.format(avg_val_acc)
+
+            with open(args.logfile, 'w') as json_file:
+                json.dump(json_data, json_file)
         if avg_train_acc < 0.97:
             print('Cannot prune any more!')
 

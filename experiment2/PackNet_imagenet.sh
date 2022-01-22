@@ -2,8 +2,8 @@
 #this file created by Jian
 cd ..
 DATASETS=(
-    'None'     # dummy
-    'imagenet'
+#    'None'     # dummy
+#    'imagenet'
     'cubs_cropped'
     'stanford_cars_cropped'
     'flowers'
@@ -11,8 +11,8 @@ DATASETS=(
     'sketches'
 )
 NUM_CLASSES=(
-    0
-    1000
+#    0
+#    1000
     200
     196
     102
@@ -20,13 +20,13 @@ NUM_CLASSES=(
     250
 )
 INIT_LR=(
-    0
-    1e-3
-    1e-3
-    1e-3
-    1e-3
-    1e-3
-    1e-3
+#    0
+#    1e-2
+    1e-2
+    1e-2
+    1e-2
+    1e-2
+    1e-2
 )
 GPU_ID=0
 one_shot_prune_perc=0.6
@@ -35,9 +35,9 @@ arch='resnet18'
 finetune_epochs=100
 prune_epochs=30
 
-PATH_DATA='/content/drive/MyDrive/dataset/KM_dataset'
+PATH_DATA='/vol/jj/dataset/KM_dataset'
 
-for TASK_ID in `seq 2 6`; do
+for TASK_ID in `seq 1 4`; do
   if [ "$TASK_ID" != "1" ]
   then
       CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_imagenet_main.py \

@@ -32,24 +32,24 @@ NUM_CLASSES=(
 #)
 INIT_LR=(
     0
-    1e-3
-    1e-3
-    1e-3
-    1e-3
-    1e-3
-    1e-3
+    1e-2
+    1e-2
+    1e-2
+    1e-2
+    1e-2
+    1e-2
 )
 
 
 GPU_ID=0,1,2
 ARCH='resnet18'
 FINETUNE_EPOCHS=100
-PATH_DATA='/content/drive/MyDrive/dataset/KM_dataset'
+PATH_DATA='/vol/jj/dataset/KM_dataset'
 # ResNet50 pretrained on ImageNet
-echo {\"imagenet\": \"0.7616\"} > logs/baseline_imagenet_acc_${ARCH}.txt
+#echo {\"imagenet\": \"0.7616\"} > logs/baseline_imagenet_acc_${ARCH}.txt
 
 #for TASK_ID in `seq 2 6`; do
-for TASK_ID in 3; do
+for TASK_ID in 2 6; do
     CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_imagenet_main.py \
         --arch $ARCH \
         --path $PATH_DATA \
@@ -63,7 +63,7 @@ for TASK_ID in 3; do
         --use_imagenet_pretrained
 done
 
-for HISTORY_ID in `seq 3`; do
+for HISTORY_ID in `seq 2 6`; do
     CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_imagenet_main.py \
         --arch $ARCH \
         --path $PATH_DATA \
