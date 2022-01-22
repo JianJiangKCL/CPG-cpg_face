@@ -41,7 +41,7 @@ INIT_LR=(
 )
 
 
-GPU_ID=0,1,2
+GPU_ID=1
 ARCH='resnet18'
 FINETUNE_EPOCHS=100
 PATH_DATA='/vol/jj/dataset/KM_dataset'
