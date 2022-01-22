@@ -284,9 +284,9 @@ def main():
         print()
         print('Sparsity ratio: {}'.format(args.one_shot_prune_perc))
         print('Before pruning: ')
-        with open(args.jsonfile, 'r') as jsonfile:
-            json_data = json.load(jsonfile)
-            baseline_acc = float(json_data[args.dataset])
+        # with open(args.jsonfile, 'r') as jsonfile:
+        #     json_data = json.load(jsonfile)
+        #     baseline_acc = float(json_data[args.dataset])
         # baseline_acc = manager.validate(start_epoch-1)
         print('Execute one shot pruning ...')
         manager.one_shot_prune(args.one_shot_prune_perc)
@@ -372,12 +372,13 @@ def main():
                 curr_lrs[0] = param_group['lr']
 
     if args.mode == 'prune':
-        if avg_train_acc > 0.97 and (avg_val_acc - baseline_acc) >= -0.01:
-            manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
-        else:
-            # added by jian
-            manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
-            print('Pruning too much!')
+        # if avg_train_acc > 0.97 and (avg_val_acc - baseline_acc) >= -0.01:
+        #     manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
+        # else:
+        # added by jian
+        manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
+        print('save ckpt of purne')
+        # print('Pruning too much!')
     elif args.mode == 'finetune':
         manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
         if args.logfile:
