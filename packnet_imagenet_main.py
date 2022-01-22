@@ -370,7 +370,8 @@ def main():
         #                 num_epochs_that_criterion_does_not_get_better))
 
         if args.mode == 'prune':
-            if epoch_idx + 1 == 40:
+            # if epoch_idx + 1 == 40:
+            if epoch_idx + 1 == 10:
                 for param_group in optimizers[0].param_groups:
                     param_group['lr'] *= 0.1
                 curr_lrs[0] = param_group['lr']
