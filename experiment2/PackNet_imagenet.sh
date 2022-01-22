@@ -49,6 +49,7 @@ for TASK_ID in `seq 0 4`; do
         --lr ${INIT_LR[TASK_ID]} \
           --weight_decay 4e-5 \
           --save_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[TASK_ID]}/scratch \
+          --jsonfile logs/PackNet_imagenet.json \
           --load_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[TASK_ID-1]}/one_shot_prune \
           --epochs $finetune_epochs \
 
@@ -60,6 +61,7 @@ for TASK_ID in `seq 0 4`; do
         --lr ${INIT_LR[TASK_ID]} \
           --weight_decay 4e-5 \
           --save_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[TASK_ID]}/scratch \
+          --jsonfile logs/PackNet_imagenet.json \
           --epochs $finetune_epochs \
           --use_imagenet_pretrained \
           --mode finetune
@@ -75,6 +77,7 @@ for TASK_ID in `seq 0 4`; do
       --weight_decay 4e-5 \
       --save_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[TASK_ID]}/one_shot_prune \
       --load_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[TASK_ID]}/scratch \
+      --jsonfile logs/PackNet_imagenet.json \
       --epochs $prune_epochs \
       --mode prune \
       --one_shot_prune_perc $one_shot_prune_perc
