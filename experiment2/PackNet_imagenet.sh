@@ -32,10 +32,10 @@ GPU_ID=0
 one_shot_prune_perc=0.6
 
 arch='resnet18'
-#finetune_epochs=100
-#prune_epochs=30
-finetune_epochs=1
-prune_epochs=1
+finetune_epochs=100
+prune_epochs=30
+#finetune_epochs=1
+#prune_epochs=1
 
 PATH_DATA='/vol/jj/dataset/KM_dataset'
 
