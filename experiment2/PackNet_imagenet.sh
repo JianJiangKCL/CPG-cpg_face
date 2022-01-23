@@ -52,6 +52,7 @@ for TASK_ID in `seq 0 4`; do
           --jsonfile logs/PackNet_imagenet.json \
           --load_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[TASK_ID-1]}/one_shot_prune \
           --epochs $finetune_epochs \
+          --mode finetune
 
   else
       CUDA_VISIBLE_DEVICES=$GPU_ID python packnet_imagenet_main.py \

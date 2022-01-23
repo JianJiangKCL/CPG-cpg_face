@@ -101,7 +101,7 @@ def main():
     args = parser.parse_args()
     if args.save_folder and not os.path.isdir(args.save_folder):
         os.makedirs(args.save_folder)
-    print(f'current task{args.dataset}, mode {args.mode}')
+    print(f'current task {args.dataset}, mode {args.mode}')
     if not torch.cuda.is_available():
         logging.info('no gpu device available')
         args.cuda = False
