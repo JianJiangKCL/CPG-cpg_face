@@ -317,7 +317,7 @@ def main():
     for epoch_idx in range(start_epoch, args.epochs):
         avg_train_acc = manager.train(optimizers, epoch_idx, curr_lrs)
         avg_val_acc = manager.validate(epoch_idx)
-        if epoch_idx + 1 == 50 or epoch_idx + 1 == 80:
+        if epoch_idx + 1 == 50 :#or epoch_idx + 1 == 80:
             for param_group in optimizers[0].param_groups:
                 param_group['lr'] *= 0.1
             curr_lrs[0] = param_group['lr']

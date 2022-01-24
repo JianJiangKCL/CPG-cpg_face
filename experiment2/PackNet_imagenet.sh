@@ -32,7 +32,7 @@ GPU_ID=0
 one_shot_prune_perc=0.6
 
 arch='resnet18'
-finetune_epochs=100
+finetune_epochs=70
 prune_epochs=30
 #finetune_epochs=1
 #prune_epochs=1
@@ -93,5 +93,5 @@ for history_id in `seq 0 4`; do
         --dataset ${DATASETS[history_id]} --num_classes ${NUM_CLASSES[TASK_ID]} \
         --load_folder checkpoints/PackNet/experiment2/$arch/${DATASETS[history_id]}/one_shot_prune \
         --mode inference \
-        --logfile logs/PackNet_imagenet.txt
+        --logfile logs/PackNet_imagenet2.txt
 done
