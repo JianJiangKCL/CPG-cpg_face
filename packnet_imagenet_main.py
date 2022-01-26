@@ -103,8 +103,7 @@ def main():
         os.makedirs(args.save_folder)
     print(f'current task {args.dataset}, mode {args.mode}')
     if not torch.cuda.is_available():
-        logging.info('no gpu device available')
-        args.cuda = False
+        print('no gpu device available')
 
     torch.manual_seed(args.seed)
     if args.cuda:

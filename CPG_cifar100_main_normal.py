@@ -114,6 +114,8 @@ def main():
     # args.batch_size = args.batch_size * torch.cuda.device_count()
     args.network_width_multiplier = math.sqrt(args.network_width_multiplier)
     args.max_allowed_network_width_multiplier = math.sqrt(args.max_allowed_network_width_multiplier)
+
+    print(f'max_allowed {args.max_allowed_network_width_multiplier}; network_width_multiplier {args.network_width_multiplier}')
     if args.mode == 'prune':
         args.save_folder = os.path.join(args.save_folder, str(args.target_sparsity))
         if args.initial_sparsity != 0.0:
@@ -401,33 +403,36 @@ def main():
         # if args.mode == 'prune' and (epoch_idx+1) >= (args.pruning_interval + start_epoch) and (
         #     avg_val_acc > history_best_avg_val_acc_when_prune):
         #     pass
-        if args.finetune_again:
-            if avg_val_acc > history_best_avg_val_acc_when_retraining:
-                history_best_avg_val_acc_when_retraining = avg_val_acc
+        #todo to fair comparison
 
-                num_epochs_that_criterion_does_not_get_better = 0
-                if args.save_folder is not None:
-                    for path in os.listdir(args.save_folder):
-                        if '.pth.tar' in path:
-                            os.remove(os.path.join(args.save_folder, path))
-                else:
-                    print('Something is wrong! Block the program with pdb')
-                    pdb.set_trace()
-
-                history_best_avg_val_acc = avg_val_acc
-                manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
-            else:
-                num_epochs_that_criterion_does_not_get_better += 1
-
-            if args.finetune_again and num_epochs_that_criterion_does_not_get_better == 5:
-                logging.info("stop retraining")
-                sys.exit(0)
+        # if args.finetune_again:
+            # if avg_val_acc > history_best_avg_val_acc_when_retraining:
+            #     history_best_avg_val_acc_when_retraining = avg_val_acc
+            #
+            #     num_epochs_that_criterion_does_not_get_better = 0
+            #     if args.save_folder is not None:
+            #         for path in os.listdir(args.save_folder):
+            #             if '.pth.tar' in path:
+            #                 os.remove(os.path.join(args.save_folder, path))
+            #     else:
+            #         print('Something is wrong! Block the program with pdb')
+            #         pdb.set_trace()
+            #
+            #     history_best_avg_val_acc = avg_val_acc
+            #     manager.save_checkpoint(optimizers, epoch_idx, args.save_folder)
+            # else:
+            #     num_epochs_that_criterion_does_not_get_better += 1
+            #
+            # if args.finetune_again and num_epochs_that_criterion_does_not_get_better == 5:
+            #     logging.info("stop retraining")
+            #     sys.exit(0)
 
         if args.mode == 'finetune':
             if epoch_idx + 1 == 50 or epoch_idx + 1 == 80:
                 for param_group in optimizers[0].param_groups:
                     param_group['lr'] *= 0.1
                 curr_lrs[0] = param_group['lr']
+            #todo what is this
             if len(optimizers.lrs) == 2:
                 if epoch_idx + 1 == 50:
                     for param_group in optimizers[1].param_groups:
@@ -472,7 +477,8 @@ def main():
             if avg_train_acc >predefined_acc and avg_val_acc >= baseline_acc:
                 logging.info("Goal fulfilled")
                 pass
-            elif args.network_width_multiplier == args.max_allowed_network_width_multiplier and avg_val_acc < baseline_acc:
+            #todo original is ==
+            elif args.network_width_multiplier >= args.max_allowed_network_width_multiplier and avg_val_acc < baseline_acc:
                 if manager.pruner.calculate_curr_task_ratio() == 0.0:
                     sys.exit(5)
                 else:
@@ -495,8 +501,8 @@ def main():
                 sys.exit(6)
 
             must_pruning_ratio_for_curr_task = 0.0
-
-            if args.network_width_multiplier == args.max_allowed_network_width_multiplier and json_data['0.0'] < baseline_acc:
+            # == to >=
+            if args.network_width_multiplier >= args.max_allowed_network_width_multiplier and json_data['0.0'] < baseline_acc:
                 # If we reach the upperbound and still do not get the accuracy over our target on curr task, we still do pruning
                 logging.info('we reach the upperbound and still do not get the accuracy over our target on curr task')
                 remain_num_tasks = args.total_num_tasks - len(dataset_history)
